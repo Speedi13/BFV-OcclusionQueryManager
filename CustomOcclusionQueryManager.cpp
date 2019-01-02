@@ -11,6 +11,20 @@ unsigned __int64 __fastcall WorldOcclusionQueryRenderModule___HkProcessBatchQuer
 	return fb__WorldOcclusionQueryRenderModule__processBatchQueries( _this, Qword, viewDesc, b );
 }
 
+typedef DWORD64 (__fastcall* t_fb__ClientVehicleEntity__Destructor)( void* entity, bool a2 );
+t_fb__ClientVehicleEntity__Destructor fb__ClientVehicleEntity__Destructor = NULL;
+
+DWORD64 __fastcall fb__ClientVehicleEntity__hkDestructor(void* entity, bool a2)
+{
+#if defined(_DEBUG_ENABLED)
+	printf("[fb::ClientVehicleEntity::Destructor] freeing pOcclusionQuery\n");
+#endif
+	CustomOcclusionQueryManager::GetInstance()->RemoveQuery( entity );
+	//release hooked vtable
+	VirtualFree( *(void**)entity, NULL, MEM_RELEASE );
+	return fb__ClientVehicleEntity__Destructor( entity, a2 );
+}
+
 void __fastcall CustomOcclusionQueryManager::hook()
 {
 	static bool bHooked = false;
@@ -110,6 +124,7 @@ void __fastcall CustomOcclusionQueryManager::EngineUpdate()
 			CustomOcclusionQueryManager::OcclusionQuery* pOcclusionQuery = this->m_querys[i];
 			if (!ValidPointer(pOcclusionQuery)) continue;
 			if ( pOcclusionQuery->m_Initialized != true ) continue;
+			/* //replaced by hooking the destructor
 			if (ValidPointer(pOcclusionQuery->m_entity))
 			{
 				DWORD64 vtable = NULL;
@@ -135,7 +150,7 @@ TRY_END;
 				free( pOcclusionQuery );
 				continue;
 			}
-
+			*/
 			if (CurrentQuery >= 32)
 			{
 				CurrentQuery = NULL;
@@ -325,7 +340,16 @@ CustomOcclusionQueryManager::OcclusionQuery* CustomOcclusionQueryManager::AddQue
 			break;
 		}
 	}
-
+	//hook the entity destructor:
+	DWORD64* vtable = *(DWORD64**)entity;
+	
+	DWORD64* newVtable = (DWORD64*)VirtualAlloc( NULL, 0x1000, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE );
+	memcpy( newVtable, vtable, 0x1000 );
+	*(DWORD64**)entity = vtable;
+	//HookVTableFunction function code: https://github.com/Speedi13/BFV-SimpleCheat/blob/master/BFV-SimpleCheat/Util.cpp#L5
+	void* oriFnc = HookVTableFunction( (DWORD64**)entity, (BYTE*)&fb__ClientVehicleEntity__hkDestructor, 10 );
+	if ( fb__ClientVehicleEntity__Destructor == NULL )
+		 fb__ClientVehicleEntity__Destructor = (t_fb__ClientVehicleEntity__Destructor)oriFnc;
 	return pQuery;
 }
 
