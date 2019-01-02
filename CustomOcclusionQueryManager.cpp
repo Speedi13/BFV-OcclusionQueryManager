@@ -328,3 +328,22 @@ CustomOcclusionQueryManager::OcclusionQuery* CustomOcclusionQueryManager::AddQue
 
 	return pQuery;
 }
+
+bool CustomOcclusionQueryManager::RemoveQuery( void* entity )
+{
+	CustomOcclusionQueryManager::OcclusionQuery* pQuery = this->GetQuery( entity );
+	if (!ValidPointer(pQuery)) return false;
+
+	for (int i = 0; i < ARRAYSIZE(this->m_querys); i++)
+	{
+		CustomOcclusionQueryManager::OcclusionQuery* pOcclusionQuery = this->m_querys[i];
+		if (!ValidPointer(pOcclusionQuery)) continue;
+		if ( pOcclusionQuery->m_entity == entity )
+		{
+			this->m_querys[i] = NULL;
+			free( this->m_querys[i] );
+			return true;
+		}
+	}
+	return false;
+}
