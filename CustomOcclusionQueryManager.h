@@ -27,6 +27,7 @@ public:
 	bool CustomOcclusionQueryManager::IsInQuery( void* entity );
 	CustomOcclusionQueryManager::OcclusionQuery* CustomOcclusionQueryManager::GetQuery( void* entity );
 	CustomOcclusionQueryManager::OcclusionQuery* CustomOcclusionQueryManager::AddQuery( void* entity, fb::WorldOcclusionQueryRenderModule::ObjectRenderInfo* info );
+	bool CustomOcclusionQueryManager::RemoveQuery( void* entity );
 	
 	static CustomOcclusionQueryManager* GetInstance()
 	{
