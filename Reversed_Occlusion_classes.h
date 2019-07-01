@@ -94,15 +94,15 @@ public:
 class WorldRenderer
 {
 public:
-	char _0x0000[2248];
-	class WorldOcclusionQueryRenderModule* m_WorldOcclusionQueriesRenderModule; //0x08C8 
-	char _0x08D0[2096];
+	char _0x0000[2248+0x18];
+	class WorldOcclusionQueryRenderModule* m_WorldOcclusionQueriesRenderModule; //0x08E0 
+	char _0x08D0[2096-0x18];
 
 	class /*fb::WorldRenderer::*/RootView
 	{
 	public:
-		char _0x0000[3232];
-		WorldViewDesc m_rootView; //0x0CA0
+		char _0x0000[3232+0x10];
+		WorldViewDesc m_rootView; //0x0CB0
 	};
 
 	RootView m_rootviews; //0x1100 
@@ -111,15 +111,15 @@ public:
 class WorldRenderModule
 {
 public:
-	char _0x0000[56];
-	WorldRenderer* m_worldRenderer; //0x0038 
+	char _0x0000[64];
+	WorldRenderer* m_worldRenderer; //0x0040 
 };
 
 class ClientLevel
 {
 public:
-	char _0x0000[0xF8];
-	WorldRenderModule* m_worldRenderModule; //0x00F8 
+	char _0x0000[0x0100];
+	WorldRenderModule* m_worldRenderModule; //0x0100 
 };
 
 class ClientGameContext
