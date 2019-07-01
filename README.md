@@ -20,15 +20,18 @@ CustomOcclusionQueryManager::GetInstance()->UpdateLocalTransform( &vLocalPos );
 ```
 
 ```cpp
+CustomOcclusionQueryManager* COcclusionQuery = CustomOcclusionQueryManager::GetInstance();
+
 //in your entity loop
 fb::LinearTransform_AABB TransformAABB = {};
 pVehicle->GetTransformAABB( TransformAABB );
-
-CustomOcclusionQueryManager::OcclusionQuery* pQuery = CustomOcclusionQueryManager::GetInstance()->GetQuery( pVehicle );
+COcclusionQuery->Enter();
+CustomOcclusionQueryManager::OcclusionQuery* pQuery = COcclusionQuery->GetQuery( pVehicle );
 if (pQuery == NULL)
-    pQuery = CustomOcclusionQueryManager::GetInstance()->AddQuery( pVehicle, NULL );
+    pQuery = COcclusionQuery->AddQuery( pVehicle, NULL );
 pQuery->UpdateQuery( &TransformAABB );
 
 bVehicleVisible = pQuery->IsVisible();
+COcclusionQuery->Leave();
 ```
 
